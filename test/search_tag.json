@@ -2,14 +2,14 @@
     "query": {
         "bool": {
             "must": [
-                {"match": {"date.keyword":"2019-05-10"}},
+                {"match": {"date":"2019-05-10"}},
                 {"match": {"tags.keyword":"python"}}
             ]
         }
     },
     "size":0,
     "sort": [
-        {"date.keyword": {"order": "desc"}}
+        {"date": {"order": "desc"}}
     ],
     "aggs": {
         "related": {

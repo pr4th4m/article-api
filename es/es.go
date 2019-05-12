@@ -22,7 +22,7 @@ const (
 	defaultHost          = "127.0.0.1"
 
 	tagFieldName  = "tags.keyword"
-	dateFieldName = "date.keyword"
+	dateFieldName = "date"
 	IDFieldName   = "id.keyword"
 	topHitSize    = 10
 )
