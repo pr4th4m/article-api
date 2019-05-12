@@ -1,0 +1,7 @@
+{
+  "id": "1",
+  "title": "Artifactory python client",
+  "date" : "2019-05-10",
+  "body" : "Artifactory is a artifact repository manager which supports software packages created by different technologies.",
+  "tags" : ["artifactory", "python"]
+}

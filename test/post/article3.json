@@ -1,0 +1,8 @@
+{
+  "id": "3",
+  "title": "Custom ansible modules",
+  "date" : "2019-05-11",
+  "body" : "Ansible modules are easy way to interact between an existing application and ansible playbook. This blog covers how to write your own ansible module",
+  "tags" : ["ansible", "python"]
+}
+

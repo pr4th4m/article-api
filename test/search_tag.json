@@ -1,0 +1,28 @@
+{
+    "query": {
+        "bool": {
+            "must": [
+                {"match": {"date.keyword":"2019-05-10"}},
+                {"match": {"tags.keyword":"python"}}
+            ]
+        }
+    },
+    "size":0,
+    "sort": [
+        {"date.keyword": {"order": "desc"}}
+    ],
+    "aggs": {
+        "related": {
+            "terms": {
+                "field": "tags.keyword",
+                "exclude": "python"
+            }
+        },
+        "ids": {
+            "terms": {
+                "field": "id.keyword",
+                "size": "10"
+            }
+        }
+    }
+}
