@@ -1,7 +1,9 @@
 **Development**
 
 - Pre-requisites
+    - Docker 17.05 or higher
     - Go 1.12.2 or higher
+    - export GO111MODULE=on
 
 - Install dependencies, elasticsearch 7.x is required
 

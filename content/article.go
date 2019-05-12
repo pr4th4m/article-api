@@ -53,18 +53,22 @@ func (a *contentArticle) SearchByTag(tag, date string) (TagSearchResult, error) 
 
 	// Get search aggregations
 	aggs := searchResult.Aggregations
-	idCount, _ := aggs.Terms(es.IDCountFieldName)
-	relatedTags, _ := aggs.Terms(es.RelatedTagsFieldName)
+	idCount, idCountExists := aggs.Terms(es.IDCountFieldName)
+	relatedTags, relatedTagsExists := aggs.Terms(es.RelatedTagsFieldName)
 
 	idSlice := []string{}
-	for _, item := range idCount.Buckets {
-		idSlice = append(idSlice, string(item.KeyNumber))
+	if idCountExists {
+		for _, item := range idCount.Buckets {
+			idSlice = append(idSlice, string(item.KeyNumber))
+		}
 	}
 	a.log.Debugf("Article id count %s", idSlice)
 
 	relatedTagSlice := []string{}
-	for _, item := range relatedTags.Buckets {
-		relatedTagSlice = append(relatedTagSlice, item.Key.(string))
+	if relatedTagsExists {
+		for _, item := range relatedTags.Buckets {
+			relatedTagSlice = append(relatedTagSlice, item.Key.(string))
+		}
 	}
 	a.log.Debugf("Related tags list %s", relatedTagSlice)
 

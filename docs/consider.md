@@ -1,6 +1,6 @@
 **Considerations**
 
-- Why abstraction third party package interfaces?
+- Why abstract third party package interfaces?
     - Easily swap underling package with another.
     - Write multiple implementations easily without changing code flow.
     - Helps in testing.
