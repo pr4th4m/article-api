@@ -1,5 +1,13 @@
 package logger
 
+/*
+NOTE: This package is meant to be abstraction layer over original package
+Advantages:
+- Easily swap underling original package (zap)
+- Easily mock Logger interface for testing
+- Create custom loggers satisfying Logger interface
+*/
+
 import (
 	"io"
 	"os"
@@ -22,6 +30,7 @@ type Logger interface {
 	Fatalf(string, ...interface{})
 }
 
+// New logger
 func New(level zapcore.Level) Logger {
 
 	var consoleEncoder zapcore.Encoder
@@ -49,7 +58,7 @@ func New(level zapcore.Level) Logger {
 		zap.AddStacktrace(zapcore.ErrorLevel)).Sugar()
 }
 
-// NewNoop No operation logger
+// NewNoop No operation logger for testing
 func NewNoop() Logger {
 	return zap.NewNop().Sugar()
 }

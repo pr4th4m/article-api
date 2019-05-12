@@ -10,12 +10,15 @@ import (
 	"github.com/pratz/nine-article-api/logger"
 )
 
+// ArticleEnv article endpoint environment
 type ArticleEnv struct {
 	Log logger.Logger
 }
 
+// Create new article
 func (e *ArticleEnv) Create(res http.ResponseWriter, req *http.Request) {
 
+	// Parse input
 	fields := content.Fields{}
 	if err := ParseJSON(req, &fields); err != nil {
 		e.Log.Error(err)
@@ -32,6 +35,7 @@ func (e *ArticleEnv) Create(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// Create new article
 	if err := article.Save(fields); err != nil {
 		e.Log.Error(err)
 		RenderJSON(res, http.StatusInternalServerError,
@@ -44,6 +48,7 @@ func (e *ArticleEnv) Create(res http.ResponseWriter, req *http.Request) {
 	RenderJSON(res, http.StatusOK, msg)
 }
 
+// Get new article
 func (e *ArticleEnv) Get(res http.ResponseWriter, req *http.Request) {
 
 	ID := mux.Vars(req)["id"]
@@ -55,6 +60,7 @@ func (e *ArticleEnv) Get(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// Get new article
 	fields, err := article.Get(ID)
 	if err != nil {
 		e.Log.Error(err)
@@ -66,6 +72,7 @@ func (e *ArticleEnv) Get(res http.ResponseWriter, req *http.Request) {
 	RenderJSON(res, http.StatusOK, fields)
 }
 
+// Search article by tag
 func (e *ArticleEnv) Search(res http.ResponseWriter, req *http.Request) {
 
 	tag := mux.Vars(req)["tag"]
@@ -79,6 +86,7 @@ func (e *ArticleEnv) Search(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// Search article
 	result, err := article.SearchByTag(tag, date)
 	if err != nil {
 		e.Log.Error(err)

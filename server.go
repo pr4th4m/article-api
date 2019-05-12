@@ -14,12 +14,13 @@ import (
 )
 
 func main() {
+	// Get host, port and debug level as flags
 	host := flag.String("host", "localhost", "Server address")
 	port := flag.String("port", "8080", "Server address")
 	loglevel := zap.LevelFlag("loglevel", zap.InfoLevel, "Control log level")
 	flag.Parse()
 
-	// Configure env
+	// Prep endpoint environment
 	l := logger.New(*loglevel)
 	env := &endpoint.ArticleEnv{Log: l}
 
@@ -35,11 +36,13 @@ func main() {
 	address := fmt.Sprintf("%s:%s", *host, *port)
 	l.Infof("Server running on %s", address)
 
+	// Define CORS
 	allowedHeaders := handlers.AllowedHeaders([]string{"Accept", "Content-Type", "Content-Length",
 		"Accept-Encoding", "X-CSRF-Token", "Authorization"})
 	allowedMethods := handlers.AllowedMethods([]string{"POST", "GET", "OPTIONS", "PUT", "DELETE", "PATCH"})
 	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
 
+	// Start server
 	log.Fatal(http.ListenAndServe(address,
 		handlers.CORS(allowedHeaders, allowedMethods, allowedOrigins)(router)))
 }

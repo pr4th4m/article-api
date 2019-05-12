@@ -1,5 +1,13 @@
 package es
 
+/*
+NOTE: This package is meant to be abstraction layer over original package
+Advantages:
+- Easily swap underling original package (elastic)
+- Easily mock ElasticSearch interface for testing
+- Create custom search engine satisfying ElasticSearch interface
+*/
+
 import (
 	"context"
 
@@ -16,17 +24,23 @@ const (
 	topHitSize    = 10
 )
 
+// ElasticSearch top level interface
 type ElasticSearch interface {
 	Index(name, typ, ID string, body interface{}) (*elastic.IndexResponse, error)
 	Get(name, typ, ID string) (*elastic.GetResult, error)
 	SearchByTag(index, typ, tag, date string) (*elastic.SearchResult, error)
 }
 
+// NOTE: No need to pass our logger here
+// as we can use original packages logger
+// see NewES below
+// customES elasticsearch wrapper
 type customES struct {
 	client *elastic.Client
 	ctx    context.Context
 }
 
+// Index new document
 func (e *customES) Index(name, typ, ID string,
 	body interface{}) (*elastic.IndexResponse, error) {
 
@@ -37,6 +51,7 @@ func (e *customES) Index(name, typ, ID string,
 	return doc, nil
 }
 
+// Get new document
 func (e *customES) Get(name, typ, ID string) (*elastic.GetResult, error) {
 
 	doc, err := e.client.Get().Index(name).Type(typ).Id(ID).Do(e.ctx)
@@ -46,15 +61,19 @@ func (e *customES) Get(name, typ, ID string) (*elastic.GetResult, error) {
 	return doc, nil
 }
 
+// SearchByTag search documents by tag
 func (e *customES) SearchByTag(index, typ, tag,
 	date string) (*elastic.SearchResult, error) {
 
+	// Create match queries for date and tag
 	dateQuery := elastic.NewMatchQuery(dateFieldName, date)
 	tagQuery := elastic.NewMatchQuery(tagFieldName, tag)
 
+	// Create bool query
 	boolQuery := elastic.NewBoolQuery()
 	boolQuery.Must(dateQuery, tagQuery)
 
+	// create id count and related aggregations
 	relatedTagAgg := elastic.NewTermsAggregation().Field(tagFieldName).ExcludeValues(tag)
 	idCountAgg := elastic.NewTermsAggregation().Field(IDFieldName).Size(topHitSize)
 
@@ -74,10 +93,13 @@ func (e *customES) SearchByTag(index, typ, tag,
 	return searchResult, nil
 }
 
+// NewES custom wrapper around elastic package
 func NewES(ctx context.Context) (ElasticSearch, error) {
 
 	client, err := elastic.NewClient(
 		elastic.SetSniff(false),
+
+		// NOTE: We can turn on "elastic" packages debugging with env var
 		// https://github.com/olivere/elastic/wiki/Logging
 		// elastic.SetErrorLog(log.New(os.Stderr, "ELASTIC ", log.LstdFlags)),
 		// elastic.SetInfoLog(log.New(os.Stdout, "", log.LstdFlags)),

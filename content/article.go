@@ -17,11 +17,13 @@ const (
 	typ               = "article"
 )
 
+// contentArticle - Article is type of Content
 type contentArticle struct {
 	esclient es.ElasticSearch
 	log      logger.Logger
 }
 
+// Save new article
 func (a *contentArticle) Save(fields Fields) error {
 	_, err := a.esclient.Index(index, typ, fields.ID, fields)
 	if err != nil {
@@ -31,9 +33,11 @@ func (a *contentArticle) Save(fields Fields) error {
 	return nil
 }
 
+// SearchByTag search articles
 func (a *contentArticle) SearchByTag(tag, date string) (TagSearchResult, error) {
 	tagResult := TagSearchResult{}
 
+	// Convert input date format to match with saved date
 	t, err := time.Parse(inputDatelayout, date)
 	if err != nil {
 		return tagResult, fmt.Errorf("Invalid date format")
@@ -41,11 +45,13 @@ func (a *contentArticle) SearchByTag(tag, date string) (TagSearchResult, error) 
 	formattedDate := t.Format(defaultDatelayout)
 	a.log.Debugf("Date format changed to %s", formattedDate)
 
+	// Search for articles
 	searchResult, err := a.esclient.SearchByTag(index, typ, tag, formattedDate)
 	if err != nil {
 		return tagResult, err
 	}
 
+	// Get search aggregations
 	aggs := searchResult.Aggregations
 	idCount, _ := aggs.Terms(es.IDCountFieldName)
 	relatedTags, _ := aggs.Terms(es.RelatedTagsFieldName)
@@ -71,6 +77,7 @@ func (a *contentArticle) SearchByTag(tag, date string) (TagSearchResult, error) 
 	return tagResult, nil
 }
 
+// Get article by ID
 func (a *contentArticle) Get(ID string) (Fields, error) {
 
 	fields := Fields{}
@@ -79,6 +86,7 @@ func (a *contentArticle) Get(ID string) (Fields, error) {
 		return fields, err
 	}
 
+	// Unmarshal raw result to go struct
 	raw, err := doc.Source.MarshalJSON()
 	if err != nil {
 		return fields, err
@@ -92,6 +100,7 @@ func (a *contentArticle) Get(ID string) (Fields, error) {
 	return fields, nil
 }
 
+// NewArticle for article related operations
 func NewArticle(ctx context.Context,
 	l logger.Logger) (Content, error) {
 

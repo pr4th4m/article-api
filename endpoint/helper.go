@@ -7,15 +7,16 @@ import (
 )
 
 const (
+	// easily switch api versions
 	apiVersion = "/api/v1"
 )
 
-// JSONError as rest response
+// JSONError as rest error response
 type JSONError struct {
 	Error string `json:"error"`
 }
 
-// VOne prefix endpoints with api version 1
+// VOne prefix endpoints with api version v1
 func VOne(path string) string {
 	switch {
 	case len(path) > 0:
@@ -30,17 +31,15 @@ func RenderJSON(w http.ResponseWriter, status int, obj interface{}) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 
-	// log.Println("Render response", obj)
 	return json.NewEncoder(w).Encode(obj)
 }
 
-// ParseJSON from incoming requests
+// ParseJSON from input request
 func ParseJSON(req *http.Request, obj interface{}) error {
 
 	if err := json.NewDecoder(req.Body).Decode(obj); err != nil {
 		return fmt.Errorf("Invalid request json. Error:%s", err)
 	}
 
-	// log.Println("Parsed request ", obj)
 	return nil
 }
