@@ -10,6 +10,8 @@ Advantages:
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	"github.com/olivere/elastic/v7"
 )
@@ -17,6 +19,7 @@ import (
 const (
 	RelatedTagsFieldName = "related"
 	IDCountFieldName     = "ids"
+	defaultHost          = "127.0.0.1"
 
 	tagFieldName  = "tags.keyword"
 	dateFieldName = "date.keyword"
@@ -96,8 +99,17 @@ func (e *customES) SearchByTag(index, typ, tag,
 // NewES custom wrapper around elastic package
 func NewES(ctx context.Context) (ElasticSearch, error) {
 
+	// TODO: Figure out a better alternative
+	// Hack to fix network issue inside docker
+	host := os.Getenv("ES_HOST")
+	if host == "" {
+		host = defaultHost
+	}
+	addr := fmt.Sprintf("http://%s:9200", host)
+
 	client, err := elastic.NewClient(
 		elastic.SetSniff(false),
+		elastic.SetURL(addr),
 
 		// NOTE: We can turn on "elastic" packages debugging with env var
 		// https://github.com/olivere/elastic/wiki/Logging

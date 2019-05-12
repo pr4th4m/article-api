@@ -1,0 +1,20 @@
+version: '3'
+services:
+  article_api:
+    container_name: 'article_api'
+    image: 'article_api:latest'
+    environment:
+      - 'ES_HOST=elasticsearch'
+    ports:
+      - '8080:8080'
+    depends_on:
+      - 'elasticsearch'
+    links:
+      - 'elasticsearch'
+  elasticsearch:
+    container_name: 'elasticsearch'
+    image: 'elasticsearch:7.0.1'
+    environment:
+      - 'discovery.type=single-node'
+    ports:
+      - '9200:9200'
